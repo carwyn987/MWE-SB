@@ -29,10 +29,10 @@ env = gym.make("CartPole-v1", render_mode=None)
 prior_observation, info = env.reset()
 
 n_inputs = env.observation_space.shape[0]
-n_hidden = 64
+n_hidden = 32
 n_outputs = env.action_space.n
 network = PolicyGradientNetwork(n_inputs, n_hidden, n_outputs)
-optimizer = torch.optim.Adam(network.parameters(), lr=1e-4)
+optimizer = torch.optim.Adam(network.parameters(), lr=1e-3)
 def loss_fn(data_store):
     loss = 0
     for (obs, act, _return) in data_store:
@@ -45,11 +45,11 @@ def loss_fn(data_store):
     # log_probs = -1.0 * torch.log(torch.gather(network(obs), 1, act.unsqueeze(1)))
     # return torch.sum(log_probs * _return)
 
-num_episodes = 1200
-epsilon = 0.05
+num_episodes = 2500
+epsilon = 0.1
 return_save = []
 loss_save = []
-data_store = deque(maxlen=100)
+data_store = deque(maxlen=10000)
 
 for episode_idx in tqdm(range(num_episodes)):
     data_store.append([])
@@ -80,7 +80,7 @@ env.close()
 # Save data with OPTIONAL plotter
 try:
     normalized_return_save = [x/env.spec.reward_threshold for x in return_save]
-    save_returns(returns=normalized_return_save, file_name=gen_filepth(model_name='vpg', environment_name='cartpole-v1', additional_name='')) 
+    save_returns(returns=normalized_return_save, file_name=gen_filepth(model_name='vpg', environment_name='cartpole-v1', additional_name='tuned-1')) 
 except Exception as err:
     print(f"Unexpected {err=} while saving returns, {type(err)=}")
 

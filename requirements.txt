@@ -1,4 +1,5 @@
 gymnasium
+gymnasium[classic-control]
 tqdm
 torch
 numpy

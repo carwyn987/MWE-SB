@@ -4,13 +4,18 @@ import pickle
 import os
 import numpy as np
 
-def moving_average(data, window_size=20):
+def moving_average(data, window_size=3):
     if window_size < 1 or len(data) <= window_size:
         return data  # No smoothing if window_size is invalid
     kernel = np.ones(window_size) / window_size
     return np.convolve(data, kernel, mode='valid')
 
-def compare_all(returns_dir: str, save_dir: str, smoothed: bool):
+def sample_list(data, period=10):
+    if len(data) <= period:
+        return data
+    return data[::period]
+
+def compare_all(returns_dir: str, save_dir: str, smoothed: bool, sampled: bool):
     # Load all
     files = os.listdir(returns_dir)
     all_data = {}
@@ -39,6 +44,8 @@ def compare_all(returns_dir: str, save_dir: str, smoothed: bool):
     for filename, returns in all_data.items():
         if smoothed:
             returns = moving_average(returns)
+        if sampled:
+            returns = sample_list(returns)
         ax.plot(returns, label=filename.split('.')[0])
     ax.legend()
     ax.set_xlabel("Episode")
@@ -53,6 +60,7 @@ if __name__ == "__main__":
     parser.add_argument("--returns_dir", default="../data/returns/")
     parser.add_argument("--save_dir", default="../data/media/")
     parser.add_argument("--smoothed", action="store_true", help="Enable smoothing")
+    parser.add_argument("--sampled", action="store_true", help="Enable sampling")
     args = parser.parse_args()
 
-    compare_all(args.returns_dir, args.save_dir, args.smoothed)
+    compare_all(args.returns_dir, args.save_dir, args.smoothed, args.sampled)

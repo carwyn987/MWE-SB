@@ -42,7 +42,7 @@ n_actions = env.action_space.n
 print("|Observation| = ", state_space, ", |Action| = ", n_actions)
 
 # Set up networks
-n_hidden = 64
+n_hidden = 32
 lr = 1e-3
 reward_model = GenericNetwork(state_space, n_hidden, 1).to(device)
 forward_model = GenericNetwork(state_space + 1, n_hidden, state_space).to(device)
@@ -58,7 +58,7 @@ action_value_loss_fn = lambda x,y: (x - y)**2
 reward_loss_fn = lambda x,y: (x - y)**2
 forward_model_loss_fn = lambda x,y: torch.sum((x - y)**2)
 
-num_episodes = 1200
+num_episodes = 2500
 train_iters = 1
 epsilon = 0.1
 gamma = 0.99
@@ -142,7 +142,7 @@ env.close()
 # Save data with OPTIONAL plotter
 try:
     normalized_return_save = [x/env.spec.reward_threshold for x in return_save]
-    save_returns(returns=normalized_return_save, file_name=gen_filepth(model_name='dyna-q', environment_name='cartpole-v1', additional_name='vanilla')) 
+    save_returns(returns=normalized_return_save, file_name=gen_filepth(model_name='dyna-q', environment_name='cartpole-v1', additional_name='vanilla-v3')) 
 except Exception as err:
     print(f"Unexpected {err=} while saving returns, {type(err)=}")
 
